@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>🔍 Busca de Cidade</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        input {
+            width: 300px;
+            border: none;
+        }
+
+        button {
+            background-color: #1e88e5;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1565c0;
+        }
+
+        #copiar-numeros {
+            background-color: #00c853;
+        }
+
+        #copiar-numeros:hover {
+            background-color: #00a047;
+        }
+
+        pre {
+            text-align: left;
+            margin: 20px auto;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Buscar Cidades na Planilha</h1>
+    <form id="form-busca">
+        <input type="text" id="cidade" placeholder="Digite o nome da cidade" required>
+        <button type="submit">Buscar</button>
+    </form>
+
+    <button id="copiar-numeros" style="display: none;">📋 Copiar Números</button>
+
+    <pre id="resultado">Digite o nome de uma cidade acima.</pre>
+
+    <script>
+        let ultimosNumeros = [];
+
+        document.getElementById("form-busca").onsubmit = async function(e) {
+            e.preventDefault();
+            const cidade = document.getElementById("cidade").value;
+            const resposta = await fetch(`/buscar?cidade=${encodeURIComponent(cidade)}`);
+            const dados = await resposta.json();
+
+            const resultado = document.getElementById("resultado");
+            const botaoCopiar = document.getElementById("copiar-numeros");
+
+            if (dados.erro) {
+                resultado.textContent = "❌ " + dados.erro;
+                botaoCopiar.style.display = "none";
+                ultimosNumeros = [];
+            } else {
+                resultado.textContent = `✅ Resultado:\n\n${dados.resultado}\n\n📱 Números encontrados:\n${dados.numeros.join("\n")}`;
+                ultimosNumeros = dados.numeros;
+                botaoCopiar.style.display = "inline-block";
+            }
+        };
+
+        document.getElementById("copiar-numeros").onclick = function() {
+            if (ultimosNumeros.length > 0) {
+                const texto = ultimosNumeros.join("\n");
+                navigator.clipboard.writeText(texto).then(() => {
+                    alert("✅ Números copiados para a área de transferência!");
+                });
+            }
+        };
+    </script>
+</body>
+</html>
+
+
+
+
+
